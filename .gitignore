@@ -1,3 +1,4 @@
 /.env
 /catalog
 /catalog.csv
+node_modules
