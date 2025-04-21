@@ -190,15 +190,22 @@ header p {
     color: var(--secondary-color);
 }
 
+/* Nouvelle structure pour le contenu de la sidebar */
 .sidebar-content {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 1rem;
-    height: calc(100% - 120px); /* Hauteur fixe calculée */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
 }
 
+/* Champ de recherche fixe */
 .sidebar-search {
-    margin-bottom: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: white;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .sidebar-search input {
@@ -209,11 +216,11 @@ header p {
     font-size: 0.9rem;
 }
 
+/* Liste de produits avec défilement */
 .product-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    flex: 1;
     overflow-y: auto;
+    padding: 1rem;
 }
 
 .product-item {
@@ -237,6 +244,7 @@ header p {
 .product-item-meta {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-size: 0.8rem;
     color: var(--light-text);
 }
@@ -256,6 +264,18 @@ header p {
 
 .out-of-stock {
     color: #dc3545;
+}
+
+/* Pagination fixe en bas */
+.pagination {
+    position: sticky;
+    bottom: 0;
+    background-color: white;
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .sidebar-footer {
@@ -599,13 +619,6 @@ header p {
     background-color: var(--primary-hover);
 }
 
-.pagination {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
 .pagination-btn {
     background-color: #f8f9fa;
     border: 1px solid var(--border-color);
@@ -655,6 +668,43 @@ footer {
 .product-link:hover {
     color: #004080;
     text-decoration: underline;
+}
+
+/* Bouton de lien vers le produit */
+.product-link-button {
+    display: inline-block;
+    padding: 3px 8px;
+    margin: 0 6px;
+    background-color: #155724;
+    color: white;
+    border-radius: 3px;
+    text-decoration: none;
+    font-size: 11px;
+    transition: background-color 0.2s;
+}
+
+.product-link-button:hover {
+    background-color: #0d3d17;
+}
+
+/* Bouton de lien dans la vue détaillée */
+.product-detail-link-container {
+    margin: 8px 0;
+}
+
+.product-detail-link-button {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #155724;
+    color: white;
+    border-radius: 3px;
+    text-decoration: none;
+    font-size: 12px;
+    transition: background-color 0.2s;
+}
+
+.product-detail-link-button:hover {
+    background-color: #0d3d17;
 }
 
 /* Style pour les questions rapides en haut */
@@ -743,4 +793,33 @@ footer {
         width: 100%;
         margin-left: 0;
     }
+}
+/* Style pour les prix dans la liste des produits */
+.product-item-price {
+    color: #ff0000 !important; /* Rouge */
+    font-weight: bold !important;
+}
+
+/* Style pour les prix dans les détails du produit */
+.product-detail-price {
+    color: #ff0000 !important; /* Rouge */
+    font-weight: bold !important;
+}
+
+/* Pour les prix dans les cartes de produits du catalogue */
+.product-card .product-details strong {
+    color: #ff0000;
+    font-weight: bold;
+}
+
+/* Style pour les prix dans les messages du chat */
+.chat-price {
+    color: #ff0000 !important;
+    font-weight: bold !important;
+}
+
+/* S'assurer que les prix restent en rouge et gras même dans les messages de l'assistant */
+.bot-message .chat-price {
+    color: #ff0000 !important;
+    font-weight: bold !important;
 }

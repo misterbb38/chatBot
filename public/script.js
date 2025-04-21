@@ -1171,7 +1171,53 @@ document.addEventListener('DOMContentLoaded', function () {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
+    // function formatMarkdown(text) {
+    //     text = text.replace(/```([a-z]*)\n([\s\S]*?)```/g, (m, lang, code) => `<pre><code>${code}</code></pre>`);
+    //     text = text.replace(/### (.*)/g, '<h3>$1</h3>')
+    //         .replace(/## (.*)/g, '<h2>$1</h2>')
+    //         .replace(/# (.*)/g, '<h1>$1</h1>')
+    //         .replace(/^\* (.*)/gm, '<li>$1</li>')
+    //         .replace(/^\d+\. (.*)/gm, '<li>$1</li>')
+    //         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    //         .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    //         .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')
+    //         .replace(/\n/g, '<br>');
+    //     return text;
+    // }
+    // function formatMarkdown(text) {
+    //     // Formatage existant
+    //     text = text.replace(/```([a-z]*)\n([\s\S]*?)```/g, (m, lang, code) => `<pre><code>${code}</code></pre>`);
+    //     text = text.replace(/### (.*)/g, '<h3>$1</h3>')
+    //         .replace(/## (.*)/g, '<h2>$1</h2>')
+    //         .replace(/# (.*)/g, '<h1>$1</h1>')
+    //         .replace(/^\* (.*)/gm, '<li>$1</li>')
+    //         .replace(/^\d+\. (.*)/gm, '<li>$1</li>')
+    //         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    //         .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    //         .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+    //     // Recherche spécifique des expressions de prix
+    //     // Cela cible précisément les motifs comme "Цена: 1234 руб" ou "💰 Цена: 500 ₽"
+    //     text = text.replace(/(💰\s*)?(Цена|цена|Стоимость|стоимость):\s*(\d+[\s\d]*[\.,]?\d*)\s*(₽|руб\.?|RUB)/g,
+    //         '$1<span style="color: red; font-weight: bold;">$2: $3 $4</span>');
+
+    //     // Pour les lignes commençant par "- Цена:" dans les listes
+    //     text = text.replace(/(-\s*)(Цена|цена|Стоимость|стоимость):\s*(\d+[\s\d]*[\.,]?\d*)\s*(₽|руб\.?|RUB)/g,
+    //         '$1<span style="color: red; font-weight: bold;">$2: $3 $4</span>');
+
+    //     // Pour les expressions comme "цена составляет 1234 рублей"
+    //     text = text.replace(/(Цена|цена|Стоимость|стоимость)\s+составляет\s+(\d+[\s\d]*[\.,]?\d*)\s*(₽|руб\.?|рубл[а-я]+|RUB)/g,
+    //         '<span style="color: red; font-weight: bold;">$1 составляет $2 $3</span>');
+
+    //     // Ensuite, convertit les sauts de ligne
+    //     text = text.replace(/\n/g, '<br>');
+
+    //     return text;
+    // }
+
+
     function formatMarkdown(text) {
+        // Formatage existant
         text = text.replace(/```([a-z]*)\n([\s\S]*?)```/g, (m, lang, code) => `<pre><code>${code}</code></pre>`);
         text = text.replace(/### (.*)/g, '<h3>$1</h3>')
             .replace(/## (.*)/g, '<h2>$1</h2>')
@@ -1180,10 +1226,67 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace(/^\d+\. (.*)/gm, '<li>$1</li>')
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')
-            .replace(/\n/g, '<br>');
+            .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+        // Capture tous les cas de prix dans différents formats
+        // 1. Format emoji + Цена
+        text = text.replace(/(💰\s*)(Цена|цена|Стоимость|стоимость):\s*(\d+[\s\d]*[\.,]?\d*)\s*(₽|руб\.?|RUB)/g,
+            '$1<span style="color: red; font-weight: bold;">$2: $3 $4</span>');
+
+        // 2. Format standard Цена sans emoji
+        text = text.replace(/(?<!💰\s*)(Цена|цена|Стоимость|стоимость):\s*(\d+[\s\d]*[\.,]?\d*)\s*(₽|руб\.?|RUB)/g,
+            '<span style="color: red; font-weight: bold;">$1: $2 $3</span>');
+
+        // 3. Format avec le prix au milieu d'une phrase
+        text = text.replace(/(цена которого составляет)\s+(\d+[\s\d]*[\.,]?\d*)\s*(₽|руб\.?|рубл[а-я]+|RUB)/g,
+            '<span style="color: red; font-weight: bold;">$1 $2 $3</span>');
+
+        // 4. Format dans les listes avec tiret
+        text = text.replace(/(-\s*)(Цена|цена|Стоимость|стоимость):\s*(\d+[\s\d]*[\.,]?\d*)\s*(₽|руб\.?|RUB)/g,
+            '$1<span style="color: red; font-weight: bold;">$2: $3 $4</span>');
+
+        // 5. Capture simple du prix en chiffres suivis de руб ou ₽
+        text = text.replace(/(?<![а-яА-Я0-9])((\d{1,3}([ \.]?\d{3})*|\d+)([\.,]\d+)?)\s*(₽|руб\.?|рубл[а-я]+|RUB)(?![а-яА-Я0-9])/g,
+            '<span style="color: red; font-weight: bold;">$1 $5</span>');
+
+        /* ---------------- Numéro Артикул cliquable ---------------- */
+        text = text.replace(/Артикул:\s*([0-9]+)/g,
+            'Артикул: <a href="#" class="insert-artikul" data-artikul="$1">$1</a>');
+
+        // Ensuite, convertit les sauts de ligne
+        text = text.replace(/\n/g, '<br>');
+
         return text;
     }
+
+
+    /* -------- NOUVEL ÉCOUTEUR POUR LES NUMÉROS Д'АРТИКУЛ -------- */
+    /* ------------------------------------------------------------------
+   Listener global : clic sur un numéro Артикул rendu cliquable
+------------------------------------------------------------------ */
+    document.addEventListener('click', function (e) {
+        if (e.target.matches('.insert-artikul')) {
+            e.preventDefault();                    // empêche le lien "#"
+            const num = e.target.dataset.artikul;  // récupère le numéro
+
+            // 1) Ouvre le panneau catalogue s'il est fermé
+            if (catalogSidebar.style.display === 'none' ||
+                getComputedStyle(catalogSidebar).display === 'none') {
+                openCatalogSidebar();              // fonction déjà définie plus haut
+            }
+
+            // 2) Remplit le champ de recherche
+            const field = document.querySelector('#catalog-search');
+            if (field) {
+                field.value = num;
+
+                // 3) Déclenche l'événement input pour lancer la recherche aussitôt
+                const evt = new Event('input', { bubbles: true });
+                field.dispatchEvent(evt);
+            }
+        }
+    });
+
 
     function formatCatalogInfo(text) {
         let fmt = '<div class="catalog-badge">Из каталога</div>';
@@ -1295,6 +1398,66 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // function renderProductList() {
+    //     const start = (currentPage - 1) * itemsPerPage;
+    //     const end = Math.min(start + itemsPerPage, filteredProducts.length);
+    //     productList.innerHTML = '';
+    //     if (!filteredProducts.length) {
+    //         productList.innerHTML = '<div class="product-item"><div class="product-item-name">Ничего не найдено</div></div>';
+    //         renderPagination(); return;
+    //     }
+    //     for (let i = start; i < end; i++) {
+    //         const p = filteredProducts[i];
+    //         const inStock = isProductInStock(p);
+
+    //         // Créer les infos additionnelles (artикул et stock) à afficher entre parenthèses
+    //         const articleCode = p['Артикул'] ? `<strong>Арт. ${p['Артикул']}</strong>` : '';
+    //         const stockInfo = inStock ? 'в наличии' : 'нет в наличии';
+    //         const additionalInfo = [articleCode].filter(Boolean).join(', ');
+
+    //         // Récupérer l'URL du produit s'il existe, sinon utiliser #
+    //         const productUrl = p['URL товара'] ? p['URL товара'] : '#';
+
+    //         const elem = document.createElement('div');
+    //         elem.className = 'product-item';
+    //         elem.dataset.index = i;
+
+
+    //         elem.innerHTML = `
+    //         <div class="product-item-name">
+    //             ${p['Наименование'] || 'Без названия'}
+    //             ${additionalInfo ? `<span class="product-item-info">(${additionalInfo})</span>` : ''}
+    //         </div>
+    //         <div class="product-item-meta">
+    //             <div class="product-item-price">${p['Цена'] ? p['Цена'] + ' ₽' : 'Цена не указана'}</div>
+    //             <a href="${productUrl}" target="_blank" class="product-link-button"> Просмотр</a>
+    //             <div class="product-item-stock ${inStock ? 'in-stock' : 'out-of-stock'}">${inStock ? 'В наличии' : 'Нет в наличии'}</div>
+    //         </div>`;
+    //         // elem.innerHTML = `
+    //         //     <div class="product-item-name">
+    //         //         <a href="${productUrl}" target="_blank" class="product-link">
+    //         //             ${p['Наименование'] || 'Без названия'}
+    //         //         </a>
+    //         //         ${additionalInfo ? `<span class="product-item-info">(${additionalInfo})</span>` : ''}
+    //         //     </div>
+    //         //     <div class="product-item-meta">
+    //         //         <div class="product-item-price">${p['Цена'] ? p['Цена'] + ' ₽' : 'Цена не указана'}</div>
+    //         //         <div class="product-item-stock ${inStock ? 'in-stock' : 'out-of-stock'}">${inStock ? 'В наличии' : 'Нет в наличии'}</div>
+    //         //     </div>`;
+
+    //         elem.addEventListener('click', (e) => {
+    //             // Si le clic est sur le lien, ne pas déclencher l'affichage du détail
+    //             if (e.target.tagName === 'A' || e.target.closest('a')) {
+    //                 e.stopPropagation();
+    //                 return;
+    //             }
+    //             showProductDetail(p);
+    //         });
+    //         productList.appendChild(elem);
+    //     }
+    //     renderPagination();
+    // }
+
     function renderProductList() {
         const start = (currentPage - 1) * itemsPerPage;
         const end = Math.min(start + itemsPerPage, filteredProducts.length);
@@ -1309,7 +1472,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Créer les infos additionnelles (artикул et stock) à afficher entre parenthèses
             const articleCode = p['Артикул'] ? `<strong>Арт. ${p['Артикул']}</strong>` : '';
-            const stockInfo = inStock ? 'в наличии' : 'нет в наличии';
             const additionalInfo = [articleCode].filter(Boolean).join(', ');
 
             // Récupérer l'URL du produit s'il existe, sinon utiliser #
@@ -1328,18 +1490,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <div class="product-item-meta">
                     <div class="product-item-price">${p['Цена'] ? p['Цена'] + ' ₽' : 'Цена не указана'}</div>
+                    <a href="#" class="product-link-button product-detail-trigger">Просмотр</a>
                     <div class="product-item-stock ${inStock ? 'in-stock' : 'out-of-stock'}">${inStock ? 'В наличии' : 'Нет в наличии'}</div>
                 </div>`;
 
-            elem.addEventListener('click', (e) => {
-                // Si le clic est sur le lien, ne pas déclencher l'affichage du détail
-                if (e.target.tagName === 'A' || e.target.closest('a')) {
-                    e.stopPropagation();
-                    return;
-                }
-                showProductDetail(p);
-            });
+            // Ajouter au DOM
             productList.appendChild(elem);
+
+            // Ajouter les événements après avoir ajouté l'élément au DOM
+            const detailTrigger = elem.querySelector('.product-detail-trigger');
+            if (detailTrigger) {
+                detailTrigger.addEventListener('click', (e) => {
+                    e.preventDefault(); // Empêcher le comportement par défaut du lien
+                    e.stopPropagation(); // Empêcher la propagation de l'événement
+                    showProductDetail(p);
+                });
+            }
         }
         renderPagination();
     }
@@ -1381,6 +1547,138 @@ document.addEventListener('DOMContentLoaded', function () {
     // ---------------------
     // Détail produit amélioré
     // ---------------------
+    // function showProductDetail(product) {
+    //     selectedProduct = product;
+
+    //     // Récupérer l'URL du produit s'il existe, sinon utiliser #
+    //     const productUrl = product['URL товара'] ? product['URL товара'] : '#';
+
+    //     // Titre avec lien
+    //     productDetailTitle.innerHTML = `<a href="${productUrl}" target="_blank" class="product-link">${product['Наименование'] || 'Название неизвестно'}</a>`;
+
+
+
+    //     productDetailPrice.textContent = product['Цена'] ? `${product['Цена']} ₽` : 'Цена не указана';
+    //     // Ajouter le bouton de lien après le prix
+    //     const linkButtonContainer = document.createElement('div');
+    //     linkButtonContainer.className = 'product-detail-link-container';
+    //     const linkButton = document.createElement('a');
+    //     linkButton.href = productUrl;
+    //     linkButton.target = '_blank';
+    //     linkButton.className = 'product-link-button product-detail-link-button';
+    //     linkButton.textContent = 'Просмотр';
+    //     linkButtonContainer.appendChild(linkButton);
+
+    //     // Insérer le bouton après l'élément de prix
+
+
+
+
+    //     const inStock = isProductInStock(product);
+    //     productDetailStock.textContent = inStock ? 'В наличии' : 'Нет в наличии';
+    //     productDetailStock.className = inStock ? 'product-detail-stock stock-available' : 'product-detail-stock stock-unavailable';
+    //     productDetailCode.textContent = product['Артикул'] || '-';
+    //     productDetailCategory.textContent = product['Категория'] || '-';
+
+    //     // Repositionner la section des questions rapides après le prix et le stock
+    //     if (productQuickQuestions) {
+    //         const infoSection = document.querySelector('.product-detail-info');
+    //         infoSection.insertBefore(productQuickQuestions, infoSection.firstChild.nextSibling.nextSibling);
+    //     }
+
+    //     if (product['Описание'] || product['Краткое описание']) {
+    //         productDetailDescription.textContent = product['Описание'] || product['Краткое описание'];
+    //         document.getElementById('product-detail-description-section').style.display = 'block';
+    //     } else document.getElementById('product-detail-description-section').style.display = 'none';
+
+    //     // Table détails
+    //     productDetailTable.innerHTML = `<tr><th>Артикул</th><td>${product['Артикул'] || '-'}</td></tr><tr><th>Категория</th><td>${product['Категория'] || '-'}</td></tr>`;
+    //     const exclude = ['Наименование', 'Артикул', 'Категория', 'Цена', 'Описание', 'Краткое описание', 'Наличие', 'URL товара'];
+    //     Object.entries(product).forEach(([k, v]) => {
+    //         if (!exclude.includes(k) && v) {
+    //             const row = document.createElement('tr'); row.innerHTML = `<th>${k}</th><td>${v}</td>`; productDetailTable.appendChild(row);
+    //         }
+    //     });
+
+    //     // Boutons questions rapides
+    //     const name = product['Наименование'] || 'этот товар';
+    //     // document.querySelectorAll('.quick-question-btn').forEach(btn => {
+    //     //     btn.dataset.question = btn.dataset.origQuestion
+    //     //         ? btn.dataset.origQuestion.replace('[PRODUCT_NAME]', name)
+    //     //         : btn.dataset.question.replace('[PRODUCT_NAME]', name);
+
+    //     //     // Sauvegarder la question originale si pas déjà fait
+    //     //     if (!btn.dataset.origQuestion) {
+    //     //         btn.dataset.origQuestion = btn.dataset.question;
+    //     //     }
+    //     // });
+
+    //     // Mise à jour des questions rapides avec le nom du produit courant
+    //     document.querySelectorAll('.quick-question-btn').forEach(btn => {
+    //         // 1) Conserver une seule fois le gabarit d’origine (avec [PRODUCT_NAME])
+    //         if (!btn.dataset.origQuestion) {
+    //             btn.dataset.origQuestion = btn.dataset.question;
+    //         }
+    //         // 2) Générer la question spécifique au produit affiché
+    //         btn.dataset.question = btn.dataset.origQuestion.replace('[PRODUCT_NAME]', name);
+    //     });
+
+    //     addToProductHistory(product);
+    //     productDetailModal.style.display = 'flex';
+    // }
+
+    // function renderProductList() {
+    //     const start = (currentPage - 1) * itemsPerPage;
+    //     const end = Math.min(start + itemsPerPage, filteredProducts.length);
+    //     productList.innerHTML = '';
+    //     if (!filteredProducts.length) {
+    //         productList.innerHTML = '<div class="product-item"><div class="product-item-name">Ничего не найдено</div></div>';
+    //         renderPagination(); return;
+    //     }
+    //     for (let i = start; i < end; i++) {
+    //         const p = filteredProducts[i];
+    //         const inStock = isProductInStock(p);
+
+    //         // Créer les infos additionnelles (artикул et stock) à afficher entre parenthèses
+    //         const articleCode = p['Артикул'] ? `<strong>Арт. ${p['Артикул']}</strong>` : '';
+    //         const additionalInfo = [articleCode].filter(Boolean).join(', ');
+
+    //         // Récupérer l'URL du produit s'il existe, sinon utiliser #
+    //         const productUrl = p['URL товара'] ? p['URL товара'] : '#';
+
+    //         const elem = document.createElement('div');
+    //         elem.className = 'product-item';
+    //         elem.dataset.index = i;
+
+    //         elem.innerHTML = `
+    //             <div class="product-item-name">
+    //                 <a href="${productUrl}" target="_blank" class="product-link">
+    //                     ${p['Наименование'] || 'Без названия'}
+    //                 </a>
+    //                 ${additionalInfo ? `<span class="product-item-info">(${additionalInfo})</span>` : ''}
+    //             </div>
+    //             <div class="product-item-meta">
+    //                 <div class="product-item-price">${p['Цена'] ? p['Цена'] + ' ₽' : 'Цена не указана'}</div>
+    //                 <a href="#" class="product-link-button product-detail-trigger">Просмотр</a>
+    //                 <div class="product-item-stock ${inStock ? 'in-stock' : 'out-of-stock'}">${inStock ? 'В наличии' : 'Нет в наличии'}</div>
+    //             </div>`;
+
+    //         // Ajouter au DOM
+    //         productList.appendChild(elem);
+
+    //         // Ajouter l'événement au bouton Просмотр
+    //         const detailTrigger = elem.querySelector('.product-detail-trigger');
+    //         if (detailTrigger) {
+    //             detailTrigger.addEventListener('click', (e) => {
+    //                 e.preventDefault();
+    //                 e.stopPropagation();
+    //                 showProductDetail(p);
+    //             });
+    //         }
+    //     }
+    //     renderPagination();
+    // }
+
     function showProductDetail(product) {
         selectedProduct = product;
 
@@ -1390,10 +1688,15 @@ document.addEventListener('DOMContentLoaded', function () {
         // Titre avec lien
         productDetailTitle.innerHTML = `<a href="${productUrl}" target="_blank" class="product-link">${product['Наименование'] || 'Название неизвестно'}</a>`;
 
+        // Afficher le prix
         productDetailPrice.textContent = product['Цена'] ? `${product['Цена']} ₽` : 'Цена не указана';
+
+        // Détermine si le produit est en stock
         const inStock = isProductInStock(product);
         productDetailStock.textContent = inStock ? 'В наличии' : 'Нет в наличии';
         productDetailStock.className = inStock ? 'product-detail-stock stock-available' : 'product-detail-stock stock-unavailable';
+
+        // Afficher les informations de base
         productDetailCode.textContent = product['Артикул'] || '-';
         productDetailCategory.textContent = product['Категория'] || '-';
 
@@ -1403,36 +1706,29 @@ document.addEventListener('DOMContentLoaded', function () {
             infoSection.insertBefore(productQuickQuestions, infoSection.firstChild.nextSibling.nextSibling);
         }
 
+        // Afficher la description si disponible
         if (product['Описание'] || product['Краткое описание']) {
             productDetailDescription.textContent = product['Описание'] || product['Краткое описание'];
             document.getElementById('product-detail-description-section').style.display = 'block';
-        } else document.getElementById('product-detail-description-section').style.display = 'none';
+        } else {
+            document.getElementById('product-detail-description-section').style.display = 'none';
+        }
 
         // Table détails
         productDetailTable.innerHTML = `<tr><th>Артикул</th><td>${product['Артикул'] || '-'}</td></tr><tr><th>Категория</th><td>${product['Категория'] || '-'}</td></tr>`;
         const exclude = ['Наименование', 'Артикул', 'Категория', 'Цена', 'Описание', 'Краткое описание', 'Наличие', 'URL товара'];
         Object.entries(product).forEach(([k, v]) => {
             if (!exclude.includes(k) && v) {
-                const row = document.createElement('tr'); row.innerHTML = `<th>${k}</th><td>${v}</td>`; productDetailTable.appendChild(row);
+                const row = document.createElement('tr');
+                row.innerHTML = `<th>${k}</th><td>${v}</td>`;
+                productDetailTable.appendChild(row);
             }
         });
 
-        // Boutons questions rapides
-        const name = product['Наименование'] || 'этот товар';
-        // document.querySelectorAll('.quick-question-btn').forEach(btn => {
-        //     btn.dataset.question = btn.dataset.origQuestion
-        //         ? btn.dataset.origQuestion.replace('[PRODUCT_NAME]', name)
-        //         : btn.dataset.question.replace('[PRODUCT_NAME]', name);
-
-        //     // Sauvegarder la question originale si pas déjà fait
-        //     if (!btn.dataset.origQuestion) {
-        //         btn.dataset.origQuestion = btn.dataset.question;
-        //     }
-        // });
-
         // Mise à jour des questions rapides avec le nom du produit courant
+        const name = product['Наименование'] || 'этот товар';
         document.querySelectorAll('.quick-question-btn').forEach(btn => {
-            // 1) Conserver une seule fois le gabarit d’origine (avec [PRODUCT_NAME])
+            // 1) Conserver une seule fois le gabarit d'origine (avec [PRODUCT_NAME])
             if (!btn.dataset.origQuestion) {
                 btn.dataset.origQuestion = btn.dataset.question;
             }
@@ -1440,11 +1736,80 @@ document.addEventListener('DOMContentLoaded', function () {
             btn.dataset.question = btn.dataset.origQuestion.replace('[PRODUCT_NAME]', name);
         });
 
+        // Ajouter à l'historique et afficher la modal
         addToProductHistory(product);
         productDetailModal.style.display = 'flex';
     }
 
+    function renderProductList() {
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = Math.min(start + itemsPerPage, filteredProducts.length);
+        productList.innerHTML = '';
+
+        if (!filteredProducts.length) {
+            productList.innerHTML = '<div class="product-item"><div class="product-item-name">Ничего не найдено</div></div>';
+            renderPagination();
+            return;
+        }
+
+        for (let i = start; i < end; i++) {
+            const p = filteredProducts[i];
+            const inStock = isProductInStock(p);
+
+            // Créer les infos additionnelles
+            const articleCode = p['Артикул'] ? `<strong>Арт. ${p['Артикул']}</strong>` : '';
+            const additionalInfo = [articleCode].filter(Boolean).join(', ');
+
+            // Récupérer l'URL du produit
+            const productUrl = p['URL товара'] ? p['URL товара'] : '#';
+
+            const elem = document.createElement('div');
+            elem.className = 'product-item';
+            elem.dataset.index = i;
+
+            elem.innerHTML = `
+                <div class="product-item-name">
+                    <a href="${productUrl}" target="_blank" class="product-link">
+                        ${p['Наименование'] || 'Без названия'}
+                    </a>
+                    ${additionalInfo ? `<span class="product-item-info">(${additionalInfo})</span>` : ''}
+                </div>
+                <div class="product-item-meta">
+                    <div class="product-item-price">${p['Цена'] ? p['Цена'] + ' ₽' : 'Цена не указана'}</div>
+                    <a href="#" class="product-link-button product-detail-trigger" data-index="${i}">Просмотр</a>
+                    <div class="product-item-stock ${inStock ? 'in-stock' : 'out-of-stock'}">${inStock ? 'В наличии' : 'Нет в наличии'}</div>
+                </div>`;
+
+            productList.appendChild(elem);
+        }
+
+        // Ajouter les écouteurs d'événements après avoir construit la liste
+        document.querySelectorAll('.product-detail-trigger').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const index = parseInt(this.dataset.index);
+                const product = filteredProducts[index];
+                showProductDetail(product);
+            });
+        });
+
+        renderPagination();
+    }
+    // function askProductQuestion(question) {
+    //     addMessage(question, true);
+    //     productDetailModal.style.display = 'none';
+    //     sendMessageWithSSE(question);
+    // }
     function askProductQuestion(question) {
+        // Si la question concerne le prix ou des caractéristiques qui incluraient normalement le prix
+        if (question.includes('характеристик') || question.includes('аналог') || question.includes('комплектующ')) {
+            // Ajouter une demande explicite du prix si pas déjà présente
+            if (!question.includes('цен') && !question.includes('стоим')) {
+                question = question + ' (включая цену)';
+            }
+        }
+
         addMessage(question, true);
         productDetailModal.style.display = 'none';
         sendMessageWithSSE(question);

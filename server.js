@@ -1026,10 +1026,102 @@ function extractProductQuery(message) {
 }
 
 // Fonction pour formatter les résultats de recherche en texte
+// function formatSearchResults(results, query) {
+//     if (!results.success) {
+//         return null;
+//     }
+
+//     if (results.products.length === 0) {
+//         return `К сожалению, по запросу "${query}" ничего не найдено в каталоге.`;
+//     }
+
+//     let response = `По запросу "${query}" найдено ${results.products.length} товаров:\n\n`;
+
+//     results.products.forEach((product, index) => {
+//         response += `**${index + 1}. ${product['Наименование'] || 'Товар без названия'}**\n`;
+
+//         // Ajouter le prix s'il existe
+//         if (product['Цена']) {
+//             response += `💰 Цена: ${product['Цена']} руб.\n`;
+//         }
+
+//         // Ajouter la catégorie si elle existe
+//         if (product['Категория']) {
+//             response += `📂 Категория: ${product['Категория']}\n`;
+//         }
+
+//         // Ajouter l'article si disponible
+//         if (product['Артикул']) {
+//             response += `📝 Артикул: ${product['Артикул']}\n`;
+//         }
+
+//         // Ajouter une description courte
+//         if (product['Краткое описание']) {
+//             response += `📄 ${product['Краткое описание']}\n`;
+//         }
+
+//         // Ajouter la disponibilité si elle existe
+//         if (product.hasOwnProperty('Наличие')) {
+//             const isAvailable = isProductInStock(product);
+//             response += `${isAvailable ? '✅' : '❌'} ${isAvailable ? 'В наличии' : 'Нет в наличии'}\n`;
+//         }
+
+//         response += "\n";
+//     });
+
+//     return response;
+// }
+
+// function formatSearchResults(results, query) {
+//     if (!results.success) {
+//         return null;
+//     }
+
+//     if (results.products.length === 0) {
+//         return `К сожалению, по запросу "${query}" ничего не найдено в каталоге.`;
+//     }
+
+//     let response = `По запросу "${query}" найдено ${results.products.length} товаров:\n\n`;
+
+//     results.products.forEach((product, index) => {
+//         response += `**${index + 1}. ${product['Наименование'] || 'Товар без названия'}**\n`;
+
+//         // Ajouter le prix s'il existe avec mise en forme spéciale 
+//         // Utiliser une balise HTML <span> avec style inline
+//         if (product['Цена']) {
+//             // Version HTML avec style inline pour le chat
+//             response += `💰 <span style="color: red; font-weight: bold;">Цена: ${product['Цена']} руб.</span>\n`;
+//         }
+
+//         // Ajouter la catégorie si elle existe
+//         if (product['Категория']) {
+//             response += `📂 Категория: ${product['Категория']}\n`;
+//         }
+
+//         // Ajouter l'article si disponible
+//         if (product['Артикул']) {
+//             response += `📝 Артикул: ${product['Артикул']}\n`;
+//         }
+
+//         // Ajouter une description courte
+//         if (product['Краткое описание']) {
+//             response += `📄 ${product['Краткое описание']}\n`;
+//         }
+
+//         // Ajouter la disponibilité si elle existe
+//         if (product.hasOwnProperty('Наличие')) {
+//             const isAvailable = isProductInStock(product);
+//             response += `${isAvailable ? '✅' : '❌'} ${isAvailable ? 'В наличии' : 'Нет в наличии'}\n`;
+//         }
+
+//         response += "\n";
+//     });
+
+//     return response;
+// }
+
 function formatSearchResults(results, query) {
-    if (!results.success) {
-        return null;
-    }
+    if (!results.success) return null;
 
     if (results.products.length === 0) {
         return `К сожалению, по запросу "${query}" ничего не найдено в каталоге.`;
@@ -1040,37 +1132,39 @@ function formatSearchResults(results, query) {
     results.products.forEach((product, index) => {
         response += `**${index + 1}. ${product['Наименование'] || 'Товар без названия'}**\n`;
 
-        // Ajouter le prix s'il existe
+        // Prix (mise en évidence rouge)
         if (product['Цена']) {
-            response += `💰 Цена: ${product['Цена']} руб.\n`;
+            response += `💰 <span style="color:red;font-weight:bold;">Цена: ${product['Цена']} руб.</span>\n`;
         }
 
-        // Ajouter la catégorie si elle existe
+        // Catégorie
         if (product['Категория']) {
             response += `📂 Категория: ${product['Категория']}\n`;
         }
 
-        // Ajouter l'article si disponible
+        // ---- Артикул cliquable ----
         if (product['Артикул']) {
-            response += `📝 Артикул: ${product['Артикул']}\n`;
+            const art = product['Артикул'];
+            response += `📝 Артикул: <a href="#" class="insert-artikul" data-artikul="${art}">${art}</a>\n`;
         }
 
-        // Ajouter une description courte
+        // Description courte
         if (product['Краткое описание']) {
             response += `📄 ${product['Краткое описание']}\n`;
         }
 
-        // Ajouter la disponibilité si elle existe
+        // Disponibilité
         if (product.hasOwnProperty('Наличие')) {
-            const isAvailable = isProductInStock(product);
-            response += `${isAvailable ? '✅' : '❌'} ${isAvailable ? 'В наличии' : 'Нет в наличии'}\n`;
+            const inStock = isProductInStock(product);
+            response += `${inStock ? '✅ В наличии' : '❌ Нет в наличии'}\n`;
         }
 
-        response += "\n";
+        response += '\n';
     });
 
     return response;
 }
+
 
 // Route principale pour servir l'interface HTML
 app.get('/', (req, res) => {
@@ -1087,7 +1181,7 @@ app.get('/api/products', (req, res) => {
     }
 
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 100000;
+    const limit = parseInt(req.query.limit) || 1000000;
     const search = req.query.search || '';
 
     let filteredProducts = productCatalog;
