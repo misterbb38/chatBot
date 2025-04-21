@@ -82,66 +82,66 @@
         </div>
     </div>
     
-    <!-- Product Detail Modal -->
-    <!-- Product Detail Modal - Version améliorée -->
-<div class="product-detail-modal" id="product-detail-modal">
-    <div class="product-detail-content">
-        <button class="product-detail-close" id="close-product-detail">&times;</button>
-        <h2 class="product-detail-title" id="product-detail-title">Название товара</h2>
-        
-        <div class="product-detail-info">
-            <div class="product-detail-price" id="product-detail-price">0 ₽</div>
-            <div class="product-detail-stock" id="product-detail-stock">Наличие неизвестно</div>
+    <!-- Product Detail Modal - Version améliorée avec modification de la position des questions rapides -->
+    <div class="product-detail-modal" id="product-detail-modal">
+        <div class="product-detail-content">
+            <button class="product-detail-close" id="close-product-detail">&times;</button>
+            <h2 class="product-detail-title" id="product-detail-title">Название товара</h2>
             
-            <div class="product-detail-section">
-                <div class="product-detail-section-title">Информация о товаре</div>
-                <table class="product-detail-table" id="product-detail-table">
-                    <tr>
-                        <th>Артикул</th>
-                        <td id="product-detail-code">-</td>
-                    </tr>
-                    <tr>
-                        <th>Категория</th>
-                        <td id="product-detail-category">-</td>
-                    </tr>
-                </table>
+            <div class="product-detail-info">
+                <div class="product-detail-price" id="product-detail-price">0 ₽</div>
+                <div class="product-detail-stock" id="product-detail-stock">Наличие неизвестно</div>
+                
+                <!-- Section des questions rapides déplacée ici, juste après le prix comme demandé -->
+                <div class="product-quick-questions" id="product-quick-questions">
+                    <div class="product-detail-section-title">Задать вопрос о товаре</div>
+                    <div class="quick-questions-grid">
+                        <button class="quick-question-btn" data-question="Какие есть аналоги для товара '[PRODUCT_NAME]'?">
+                            Аналоги
+                        </button>
+                        <button class="quick-question-btn" data-question="Какие характеристики у товара '[PRODUCT_NAME]'?">
+                            Характеристики
+                        </button>
+                        <button class="quick-question-btn" data-question="Для чего используется '[PRODUCT_NAME]'?">
+                            Применение
+                        </button>
+                        <button class="quick-question-btn" data-question="Какие отзывы о товаре '[PRODUCT_NAME]'?">
+                            Отзывы
+                        </button>
+                        <button class="quick-question-btn" data-question="Какие есть комплектующие для '[PRODUCT_NAME]'?">
+                            Комплектующие
+                        </button>
+                        <button class="quick-question-btn" data-question="Как правильно использовать '[PRODUCT_NAME]'?">
+                            Инструкция
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="product-detail-section">
+                    <div class="product-detail-section-title">Информация о товаре</div>
+                    <table class="product-detail-table" id="product-detail-table">
+                        <tr>
+                            <th>Артикул</th>
+                            <td id="product-detail-code">-</td>
+                        </tr>
+                        <tr>
+                            <th>Категория</th>
+                            <td id="product-detail-category">-</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="product-detail-section" id="product-detail-description-section">
+                    <div class="product-detail-section-title">Описание</div>
+                    <div id="product-detail-description">-</div>
+                </div>
             </div>
             
-            <div class="product-detail-section" id="product-detail-description-section">
-                <div class="product-detail-section-title">Описание</div>
-                <div id="product-detail-description">-</div>
-            </div>
-        </div>
-        
-        <div class="product-detail-actions">
-            <button class="btn-add-to-chat" id="add-product-to-chat">Добавить в чат</button>
-        </div>
-        
-        <div class="product-quick-questions">
-            <div class="product-detail-section-title">Задать вопрос о товаре</div>
-            <div class="quick-questions-grid">
-                <button class="quick-question-btn" data-question="Какие есть аналоги для товара '[PRODUCT_NAME]'?">
-                    Аналоги
-                </button>
-                <button class="quick-question-btn" data-question="Какие характеристики у товара '[PRODUCT_NAME]'?">
-                    Характеристики
-                </button>
-                <button class="quick-question-btn" data-question="Для чего используется '[PRODUCT_NAME]'?">
-                    Применение
-                </button>
-                <button class="quick-question-btn" data-question="Какие отзывы о товаре '[PRODUCT_NAME]'?">
-                    Отзывы
-                </button>
-                <button class="quick-question-btn" data-question="Какие есть комплектующие для '[PRODUCT_NAME]'?">
-                    Комплектующие
-                </button>
-                <button class="quick-question-btn" data-question="Как правильно использовать '[PRODUCT_NAME]'?">
-                    Инструкция
-                </button>
+            <div class="product-detail-actions">
+                <button class="btn-add-to-chat" id="add-product-to-chat">Добавить в чат</button>
             </div>
         </div>
     </div>
-</div>
     
     <footer>
         <div class="company-info">© 2025 Twowin</div>
