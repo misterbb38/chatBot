@@ -700,6 +700,49 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Fonction de mappage des champs Webasyst vers notre format
+// function mapWebasystProductToOurFormat(webasystProduct) {
+//     // Pour le premier produit uniquement, afficher la structure complète pour debug
+//     if (!mapWebasystProductToOurFormat.hasLoggedExampleProduct) {
+//         console.log("Exemple complet d'un produit Webasyst:", JSON.stringify(webasystProduct, null, 2));
+//         mapWebasystProductToOurFormat.hasLoggedExampleProduct = true;
+//     }
+
+//     // Extraire le contenu HTML de la description (si besoin)
+//     let cleanDescription = webasystProduct.description || '';
+//     if (cleanDescription && cleanDescription.includes('<')) {
+//         // Option simple: supprimer toutes les balises HTML
+//         cleanDescription = cleanDescription.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+//     }
+
+//     // Récupérer le premier SKU pour obtenir l'article
+//     let articleSku = '';
+//     if (webasystProduct.skus && typeof webasystProduct.skus === 'object') {
+//         // Obtenir le premier SKU
+//         const firstSkuId = Object.keys(webasystProduct.skus)[0];
+//         if (firstSkuId && webasystProduct.skus[firstSkuId]) {
+//             articleSku = webasystProduct.skus[firstSkuId].sku || '';
+//         }
+//     }
+
+//     // Mappage des champs selon l'exemple fourni
+//     return {
+//         'Наименование': webasystProduct.name || 'Товар без названия',
+//         'Артикул': articleSku || webasystProduct.sku_id || webasystProduct.id?.toString() || '',
+//         'Цена': webasystProduct.price?.toString() || '',
+//         'Наличие': parseFloat(webasystProduct.count) > 0 ? 'да' : 'нет',
+//         'Категория': webasystProduct.category_id ? `Категория ${webasystProduct.category_id}` : '',
+//         'Описание': cleanDescription,
+//         'Краткое описание': webasystProduct.summary || '',
+//         // Ajouter des champs supplémentaires qui peuvent être utiles
+//         'Производитель': '',  // À compléter si disponible
+//         'ID товара': webasystProduct.id?.toString() || '',
+//         'Единица измерения': webasystProduct.stock_unit_id || '',
+//         'Валюта': webasystProduct.currency || 'RUB',
+//         'URL товара': webasystProduct.url ? `https://twowin.ru/product/${webasystProduct.url}` : '',
+//         'Статус': webasystProduct.status === '1' ? 'Активен' : 'Неактивен'
+//     };
+// }
+
 function mapWebasystProductToOurFormat(webasystProduct) {
     // Pour le premier produit uniquement, afficher la structure complète pour debug
     if (!mapWebasystProductToOurFormat.hasLoggedExampleProduct) {
@@ -714,20 +757,21 @@ function mapWebasystProductToOurFormat(webasystProduct) {
         cleanDescription = cleanDescription.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
     }
 
-    // Récupérer le premier SKU pour obtenir l'article
+    // Récupérer le numéro d'article (SKU) à partir de l'objet skus
     let articleSku = '';
     if (webasystProduct.skus && typeof webasystProduct.skus === 'object') {
         // Obtenir le premier SKU
         const firstSkuId = Object.keys(webasystProduct.skus)[0];
         if (firstSkuId && webasystProduct.skus[firstSkuId]) {
+            // Récupérer directement la propriété "sku" de l'objet SKU
             articleSku = webasystProduct.skus[firstSkuId].sku || '';
         }
     }
 
-    // Mappage des champs selon l'exemple fourni
+    // Mappage des champs
     return {
         'Наименование': webasystProduct.name || 'Товар без названия',
-        'Артикул': articleSku || webasystProduct.sku_id || webasystProduct.id?.toString() || '',
+        'Артикул': articleSku || '', // Utiliser uniquement le SKU extrait de l'objet skus
         'Цена': webasystProduct.price?.toString() || '',
         'Наличие': parseFloat(webasystProduct.count) > 0 ? 'да' : 'нет',
         'Категория': webasystProduct.category_id ? `Категория ${webasystProduct.category_id}` : '',
@@ -790,6 +834,7 @@ async function loadCatalogFromWebasyst() {
 
             // Récupérer les produits
             const products = response.data.products || [];
+
 
             if (Array.isArray(products) && products.length > 0) {
                 console.log(`${products.length} produits récupérés dans ce lot`);
@@ -1042,7 +1087,7 @@ app.get('/api/products', (req, res) => {
     }
 
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 100;
+    const limit = parseInt(req.query.limit) || 100000;
     const search = req.query.search || '';
 
     let filteredProducts = productCatalog;
@@ -1147,7 +1192,7 @@ app.get('/api/categories/:category', (req, res) => {
 
     const category = req.params.category;
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 100;
+    const limit = parseInt(req.query.limit) || 10000000;
 
     const filteredProducts = productCatalog.filter(product =>
         product['Категория'] && product['Категория'].toLowerCase() === category.toLowerCase()
