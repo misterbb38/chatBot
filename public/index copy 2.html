@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twowin AI - Помощник по строительству</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <img src="logo.png" alt="Twowin Logo" class="logo-img">
+            </div>
+            <h1>Twowin AI</h1>
+            <p class="subtitle">Ваш интеллектуальный помощник по строительству и ремонту</p>
+        </header>
+        
+        <div class="main-container">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="chat-title">Чат с ассистентом</div>
+                    <button id="scroll-to-bottom" class="scroll-button" title="Прокрутить вниз">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message bot-message">
+                        <div class="message-role">Twowin AI</div>
+                        <div class="message-content">
+                            Добро пожаловать! Я Twowin AI - ваш интеллектуальный помощник по вопросам строительства, ремонта и выбора инструментов. Задайте мне вопрос о товарах из нашего каталога, и я постараюсь помочь вам.
+                        </div>
+                        <div class="suggestion-chips">
+                            <div class="suggestion-chip" data-query="Какие виды перфораторов у нас есть?">Виды перфораторов</div>
+                            <div class="suggestion-chip" data-query="Какие товары есть в категории плитка?">Каталог плитки</div>
+                            <div class="suggestion-chip" data-query="Сколько стоит шуруповерт Bosch?">Цены на шуруповерты</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="typing-indicator" id="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                
+                <div class="chat-controls">
+                    <div class="quick-actions">
+                        <button class="quick-action-btn" id="show-catalog-btn" title="Каталог товаров">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="user-input" placeholder="Введите ваш вопрос здесь..." autocomplete="off">
+                        <button id="send-button">Отправить</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar" id="catalog-sidebar">
+                <div class="resize-handle" id="resize-handle"></div>
+                <div class="sidebar-header">
+                    <div class="sidebar-title">Каталог товаров</div>
+                    <button class="close-sidebar" id="close-sidebar">&times;</button>
+                </div>
+                <div class="sidebar-content">
+                    <div class="sidebar-search">
+                        <input type="text" id="catalog-search" placeholder="Поиск товаров...">
+                    </div>
+                    <div class="product-list" id="product-list">
+                        <!-- Products will be loaded here dynamically -->
+                        <div class="product-item">
+                            <div class="product-item-name">Загрузка каталога...</div>
+                        </div>
+                    </div>
+                    <div class="pagination" id="catalog-pagination">
+                        <!-- Pagination will be added here -->
+                    </div>
+                </div>
+                <div class="sidebar-footer">
+                    <div class="sidebar-stats" id="catalog-stats">Загрузка данных каталога...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Product Detail Modal -->
+    <div class="product-detail-modal" id="product-detail-modal">
+        <div class="product-detail-content">
+            <button class="product-detail-close" id="close-product-detail">&times;</button>
+            <h2 class="product-detail-title" id="product-detail-title">Название товара</h2>
+            
+            <div class="product-detail-info">
+                <div class="product-detail-price" id="product-detail-price">0 ₽</div>
+                <div class="product-detail-stock" id="product-detail-stock">Наличие неизвестно</div>
+                
+                <!-- Section des questions rapides déplacée ici, juste après le prix comme demandé -->
+                <div class="product-quick-questions" id="product-quick-questions">
+                    <div class="product-detail-section-title">Задать вопрос о товаре</div>
+                    <div class="quick-questions-grid">
+                        <button class="quick-question-btn" data-question="Какие есть аналоги для товара '[PRODUCT_NAME]'?">
+                            Аналоги
+                        </button>
+                        <button class="quick-question-btn" data-question="Какие характеристики у товара '[PRODUCT_NAME]'?">
+                            Характеристики
+                        </button>
+                        <button class="quick-question-btn" data-question="Для чего используется '[PRODUCT_NAME]'?">
+                            Применение
+                        </button>
+                        <button class="quick-question-btn" data-question="Какие отзывы о товаре '[PRODUCT_NAME]'?">
+                            Отзывы
+                        </button>
+                        <button class="quick-question-btn" data-question="Какие есть комплектующие для '[PRODUCT_NAME]'?">
+                            Комплектующие
+                        </button>
+                        <button class="quick-question-btn" data-question="Как правильно использовать '[PRODUCT_NAME]'?">
+                            Инструкция
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="product-detail-section">
+                    <div class="product-detail-section-title">Информация о товаре</div>
+                    <table class="product-detail-table" id="product-detail-table">
+                        <tr>
+                            <th>Артикул</th>
+                            <td id="product-detail-code">-</td>
+                        </tr>
+                        <tr>
+                            <th>Категория</th>
+                            <td id="product-detail-category">-</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="product-detail-section" id="product-detail-description-section">
+                    <div class="product-detail-section-title">Описание</div>
+                    <div id="product-detail-description">-</div>
+                </div>
+            </div>
+            
+            <div class="product-detail-actions">
+                <button class="btn-add-to-chat" id="add-product-to-chat">Добавить в чат</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="company-info">© 2025 Twowin</div>
+        <div>Интеллектуальный помощник для сотрудников компании</div>
+    </footer>
+    
+    <script src="script.js"></script>
+</body>
+</html>

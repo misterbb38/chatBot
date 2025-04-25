@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель управления TWOWIN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary: #2a9d46;
+            --primary-dark: #1c7a33;
+            --primary-light: #3cb860;
+            --primary-transparent: rgba(42, 157, 70, 0.1);
+            --text-light: #ffffff;
+            --text-dark: #2c3e50;
+            --text-gray: #7f8c8d;
+            --background: #f9f9f9;
+            --sidebar-bg: #fff;
+            --sidebar-active: #edf7f0;
+            --card-bg: #ffffff;
+            --border-color: #eaeaea;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background);
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--text-light);
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            z-index: 100;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .logo {
+            height: 50px;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .company-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        .main-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 82px); /* Hauteur totale moins la hauteur du header */
+        }
+        
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            box-shadow: var(--shadow-md);
+            z-index: 90;
+            overflow-y: auto;
+            flex-shrink: 0;
+            border-right: 1px solid var(--border-color);
+        }
+        
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+            background-color: var(--background);
+            position: relative;
+        }
+        
+        .department-nav {
+            list-style: none;
+            padding: 1rem 0;
+        }
+        
+        .department-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .department-button {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        
+        .department-button:hover {
+            background-color: rgba(42, 157, 70, 0.05);
+        }
+        
+        .department-button.active {
+            background-color: var(--sidebar-active);
+            border-left-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .department-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-transparent);
+            color: var(--primary);
+            margin-right: 1rem;
+            font-size: 1rem;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+        
+        .department-button.active .department-icon {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(42, 157, 70, 0.3);
+        }
+        
+        .department-content {
+            display: none;
+            padding: 2rem;
+            height: 100%;
+        }
+        
+        .department-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .department-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid var(--primary-light);
+        }
+        
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .app-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .app-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-light);
+        }
+        
+        .app-header {
+            padding: 1.2rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+        }
+        
+        .app-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin-right: 0.8rem;
+            flex-shrink: 0;
+        }
+        
+        .app-title {
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+        }
+        
+        .app-body {
+            padding: 1.2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .app-description {
+            color: var(--text-gray);
+            margin-bottom: 1.2rem;
+            font-size: 0.95rem;
+        }
+        
+        .app-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            font-weight: 600;
+            padding: 0.8rem 1rem;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            text-decoration: none;
+            transition: var(--transition);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            box-shadow: 0 3px 6px rgba(42, 157, 70, 0.3);
+        }
+        
+        .app-button:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            box-shadow: 0 4px 8px rgba(42, 157, 70, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .footer {
+            background-color: var(--primary-dark);
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.9rem;
+            z-index: 100;
+        }
+        
+        @media (max-width: 992px) {
+            .apps-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .department-button {
+                padding: 0.8rem 1rem;
+            }
+            
+            .company-name {
+                font-size: 1.3rem;
+            }
+            
+            .department-title {
+                font-size: 1.5rem;
+            }
+            
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-container">
+            <img src="/api/placeholder/100/50" alt="TWOWIN Logo" class="logo">
+            <h1 class="company-name">TWOWIN - ВСЕ ДЛЯ СТРОЙКИ И РЕМОНТА</h1>
+        </div>
+    </header>
+    
+    <div class="main-container">
+        <aside class="sidebar">
+            <ul class="department-nav">
+                <li class="department-item">
+                    <button class="department-button active" data-department="logistics">
+                        <div class="department-icon">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <span>Логистика</span>
+                    </button>
+                </li>
+                <li class="department-item">
+                    <button class="department-button" data-department="it">
+                        <div class="department-icon">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                        <span>IT сервисы</span>
+                    </button>
+                </li>
+                <li class="department-item">
+                    <button class="department-button" data-department="commercial">
+                        <div class="department-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <span>Коммерческий отдел</span>
+                    </button>
+                </li>
+                <li class="department-item">
+                    <button class="department-button" data-department="accounting">
+                        <div class="department-icon">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <span>Бухгалтерия</span>
+                    </button>
+                </li>
+            </ul>
+        </aside>
+        
+        <main class="content-area">
+            <!-- Логистика -->
+            <section id="logistics" class="department-content active">
+                <h2 class="department-title">Логистика</h2>
+                <div class="apps-grid">
+                    <div class="app-card">
+                        <div class="app-header">
+                            <div class="app-icon">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <div class="app-title">Калькулятор доставки</div>
+                        </div>
+                        <div class="app-body">
+                            <div class="app-description">
+                                Рассчитайте стоимость доставки вашего груза быстро и точно
+                            </div>
+                            <a href="http://192.168.1.29:5000" class="app-button">Открыть</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- IT -->
+            <section id="it" class="department-content">
+                <h2 class="department-title">IT сервисы</h2>
+                <div class="apps-grid">
+                    <div class="app-card">
+                        <div class="app-header">
+                            <div class="app-icon">
+                                <i class="fas fa-key"></i>
+                            </div>
+                            <div class="app-title">Менеджер паролей</div>
+                        </div>
+                        <div class="app-body">
+                            <div class="app-description">
+                                Безопасное управление корпоративными паролями и доступами
+                            </div>
+                            <a href="http://192.168.1.29:4000" class="app-button">Открыть</a>
+                        </div>
+                    </div>
+                    
+                    <div class="app-card">
+                        <div class="app-header">
+                            <div class="app-icon">
+                                <i class="fas fa-file-excel"></i>
+                            </div>
+                            <div class="app-title">Объединение Excel файлов</div>
+                        </div>
+                        <div class="app-body">
+                            <div class="app-description">
+                                Извлечение и объединение данных из различных таблиц Excel
+                            </div>
+                            <a href="http://192.168.1.29:3002" class="app-button">Открыть</a>
+                        </div>
+                    </div>
+                    
+                    <div class="app-card">
+                        <div class="app-header">
+                            <div class="app-icon">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="app-title">Редактор изображений</div>
+                        </div>
+                        <div class="app-body">
+                            <div class="app-description">
+                                Профессиональная обработка изображений для сайта и каталогов
+                            </div>
+                            <a href="http://192.168.1.29:4001" class="app-button">Открыть</a>
+                        </div>
+                    </div>
+                    
+                    <div class="app-card">
+                        <div class="app-header">
+                            <div class="app-icon">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <div class="app-title">Технические характеристики</div>
+                        </div>
+                        <div class="app-body">
+                            <div class="app-description">
+                                Автоматическое получение и обработка технических характеристик товаров
+                            </div>
+                            <a href="http://192.168.1.29:3005" class="app-button">Открыть</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Коммерческий отдел -->
+            <section id="commercial" class="department-content">
+                <h2 class="department-title">Коммерческий отдел</h2>
+                <div class="apps-grid">
+                    <div class="app-card">
+                        <div class="app-header">
+                            <div class="app-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="app-title">Twowin AI</div>
+                        </div>
+                        <div class="app-body">
+                            <div class="app-description">
+                                Интеллектуальный помощник по строительству и ремонту для клиентов компании
+                            </div>
+                            <a href="http://192.168.1.29:3000" class="app-button">Открыть</a>
+                        </div>
+                    </div>
+                    
+                    <div class="app-card">
+                        <div class="app-header">
+                            <div class="app-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="app-title">Генерация описаний товаров</div>
+                        </div>
+                        <div class="app-body">
+                            <div class="app-description">
+                                Создание уникальных и привлекательных описаний для товаров каталога
+                            </div>
+                            <a href="http://192.168.1.29:3001" class="app-button">Открыть</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Бухгалтерия -->
+            <section id="accounting" class="department-content">
+                <h2 class="department-title">Бухгалтерия</h2>
+                <div class="apps-grid">
+                    <div class="app-card">
+                        <div class="app-header">
+                            <div class="app-icon">
+                                <i class="fas fa-file-contract"></i>
+                            </div>
+                            <div class="app-title">Генератор Договоров</div>
+                        </div>
+                        <div class="app-body">
+                            <div class="app-description">
+                                Автоматическое создание и управление договорами с клиентами и поставщиками
+                            </div>
+                            <a href="http://192.168.1.29:4002" class="app-button">Открыть</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <footer class="footer">
+        <p>© 2025 TWOWIN.RU - Внутренняя панель управления</p>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sélectionner tous les boutons de département
+            const departmentButtons = document.querySelectorAll('.department-button');
+            
+            // Ajouter des écouteurs d'événements à chaque bouton
+            departmentButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Supprimer la classe active de tous les boutons
+                    departmentButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Ajouter la classe active au bouton cliqué
+                    this.classList.add('active');
+                    
+                    // Obtenir l'ID du département à afficher
+                    const departmentId = this.getAttribute('data-department');
+                    
+                    // Masquer tous les contenus de département
+                    const departmentContents = document.querySelectorAll('.department-content');
+                    departmentContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Afficher le contenu du département sélectionné
+                    document.getElementById(departmentId).classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
