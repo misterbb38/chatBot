@@ -54,7 +54,133 @@ header {
     justify-content: center;
     margin-bottom: 1rem;
 }
+/* Styles pour l'autocomplétion */
+.autocomplete-results {
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    max-height: 250px;
+    overflow-y: auto;
+    display: none;
+    left: 20px;
+    right: 20px;
+    bottom: 70px;
+}
 
+.autocomplete-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-item:hover {
+    background-color: #f5f8ff;
+}
+
+.autocomplete-code {
+    color: #666;
+    font-size: 0.85em;
+    margin-left: 8px;
+}
+
+.autocomplete-price {
+    color: #e53935;
+    font-weight: bold;
+    white-space: nowrap;
+    margin-left: auto;
+}
+
+/* Style pour le helper de recherche */
+.search-helper {
+    position: absolute;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 0.9em;
+    color: #666;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-width: 300px;
+    z-index: 100;
+    bottom: 70px;
+    left: 20px;
+}
+
+/* Styles pour l'historique des produits */
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.history-title {
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+.clear-history {
+    font-size: 0.85em;
+    color: #666;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.history-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.history-item:hover {
+    background-color: #f5f8ff;
+}
+
+/* Amélioration du style pour les questions rapides */
+.quick-questions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.quick-question-btn {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.quick-question-btn:hover {
+    background-color: #e0f7fa;
+    border-color: #4fc3f7;
+}
+
+/* Amélioration pour rendre évident l'état de recherche directe */
+.direct-search-active .chat-input {
+    border-color: #2196f3;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.25);
+}
+
+/* Modifier la couleur du @ quand on est en mode recherche */
+.direct-search-prefix {
+    color: #2196f3;
+    font-weight: bold;
+}
 .logo-img {
     height: 60px;
     margin-right: 15px;
@@ -76,6 +202,7 @@ header p {
     display: flex;
     gap: 2rem;
     flex-grow: 1;
+    height: calc(100vh - 300px); /* Hauteur fixe pour le conteneur principal */
 }
 
 .chat-container {
@@ -87,6 +214,50 @@ header p {
     box-shadow: var(--card-shadow);
     overflow: hidden;
     border-top: 3px solid var(--primary-color);
+    height: 100%; /* Utilise toute la hauteur disponible */
+}
+
+/* Nouvel en-tête de chat */
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.chat-title {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.scroll-button {
+    background: none;
+    border: none;
+    color: var(--light-text);
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.scroll-button:hover {
+    background-color: #e9ecef;
+    color: var(--primary-color);
+}
+
+.scroll-button.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-button.hidden {
+    opacity: 0;
+    visibility: hidden;
 }
 
 .sidebar {
@@ -101,7 +272,9 @@ header p {
     overflow: hidden;
     border-top: 3px solid var(--secondary-color);
     position: relative; /* Pour le positionnement du redimensionneur */
+    height: 100%; /* Utilise toute la hauteur disponible */
 }
+
 .resize-handle {
     position: absolute;
     left: -5px;
@@ -143,14 +316,22 @@ header p {
     color: var(--secondary-color);
 }
 
+/* Nouvelle structure pour le contenu de la sidebar */
 .sidebar-content {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
 }
 
+/* Champ de recherche fixe */
 .sidebar-search {
-    margin-bottom: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: white;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .sidebar-search input {
@@ -161,10 +342,11 @@ header p {
     font-size: 0.9rem;
 }
 
+/* Liste de produits avec défilement */
 .product-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
 }
 
 .product-item {
@@ -188,6 +370,7 @@ header p {
 .product-item-meta {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-size: 0.8rem;
     color: var(--light-text);
 }
@@ -209,6 +392,18 @@ header p {
     color: #dc3545;
 }
 
+/* Pagination fixe en bas */
+.pagination {
+    position: sticky;
+    bottom: 0;
+    background-color: white;
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
 .sidebar-footer {
     padding: 1rem;
     border-top: 1px solid var(--border-color);
@@ -222,12 +417,13 @@ header p {
 
 .chat-messages {
     flex-grow: 1;
-    padding: 2rem;
+    padding: 1.5rem;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 15px;
-    min-height: 400px;
+    height: calc(100% - 150px); /* Hauteur calculée automatiquement */
+    scroll-behavior: smooth; /* Défilement fluide */
 }
 
 .message {
@@ -549,13 +745,6 @@ header p {
     background-color: var(--primary-hover);
 }
 
-.pagination {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
 .pagination-btn {
     background-color: #f8f9fa;
     border: 1px solid var(--border-color);
@@ -594,14 +783,102 @@ footer {
     font-weight: 500;
 }
 
+/* Styles pour les liens de produits */
+.product-link {
+    color: #0066cc;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.product-link:hover {
+    color: #004080;
+    text-decoration: underline;
+}
+
+/* Bouton de lien vers le produit */
+.product-link-button {
+    display: inline-block;
+    padding: 3px 8px;
+    margin: 0 6px;
+    background-color: #155724;
+    color: white;
+    border-radius: 3px;
+    text-decoration: none;
+    font-size: 11px;
+    transition: background-color 0.2s;
+}
+
+.product-link-button:hover {
+    background-color: #0d3d17;
+}
+
+/* Bouton de lien dans la vue détaillée */
+.product-detail-link-container {
+    margin: 8px 0;
+}
+
+.product-detail-link-button {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #155724;
+    color: white;
+    border-radius: 3px;
+    text-decoration: none;
+    font-size: 12px;
+    transition: background-color 0.2s;
+}
+
+.product-detail-link-button:hover {
+    background-color: #0d3d17;
+}
+
+/* Style pour les questions rapides en haut */
+.product-quick-questions {
+    margin-top: 15px;
+    margin-bottom: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+/* Ajustement de la grille de questions rapides */
+.quick-questions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Amélioration du style des boutons de questions */
+.quick-question-btn {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quick-question-btn:hover {
+    background-color: #e8e8e8;
+    border-color: #ccc;
+}
+
 /* Responsive styles */
 @media (max-width: 1024px) {
     .main-container {
         flex-direction: column;
+        height: auto;
     }
     
     .sidebar {
         width: 100%;
+        height: 400px;
+    }
+    
+    .chat-container {
+        height: 60vh;
     }
 }
 
@@ -643,160 +920,32 @@ footer {
         margin-left: 0;
     }
 }
-/* Styles pour les questions rapides sur le produit */
-.product-quick-questions {
-    margin-top: 1.5rem;
-    border-top: 1px solid var(--border-color);
-    padding-top: 1.5rem;
+/* Style pour les prix dans la liste des produits */
+.product-item-price {
+    color: #ff0000 !important; /* Rouge */
+    font-weight: bold !important;
 }
 
-.quick-questions-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-    margin-top: 0.75rem;
+/* Style pour les prix dans les détails du produit */
+.product-detail-price {
+    color: #ff0000 !important; /* Rouge */
+    font-weight: bold !important;
 }
 
-.quick-question-btn {
-    background-color: #f8f9fa;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 0.75rem 1rem;
-    text-align: left;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: var(--transition);
-    color: var(--text-color);
+/* Pour les prix dans les cartes de produits du catalogue */
+.product-card .product-details strong {
+    color: #ff0000;
+    font-weight: bold;
 }
 
-.quick-question-btn:hover {
-    background-color: #e8f5eb;
-    border-color: var(--primary-color);
-    color: var(--primary-color);
+/* Style pour les prix dans les messages du chat */
+.chat-price {
+    color: #ff0000 !important;
+    font-weight: bold !important;
 }
 
-/* Modifier la hauteur max de la fenêtre modale pour accommoder plus de contenu */
-.product-detail-content {
-    max-height: 95vh;
-}
-
-/* Ajouter un indicateur d'historique de produit */
-.product-history {
-    margin-top: 2rem;
-}
-
-.product-history-title {
-    font-weight: 600;
-    color: var(--secondary-color);
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.clear-history {
-    font-size: 0.8rem;
-    color: var(--light-text);
-    cursor: pointer;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    background: none;
-    border: none;
-}
-
-.clear-history:hover {
-    color: #dc3545;
-    background-color: #f8d7da;
-}
-
-.product-history-items {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    max-height: 150px;
-    overflow-y: auto;
-    padding-right: 0.5rem;
-}
-
-.history-item {
-    display: flex;
-    align-items: center;
-    padding: 0.5rem;
-    border-radius: 4px;
-    background-color: #f8f9fa;
-    border: 1px solid var(--border-color);
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: var(--transition);
-}
-
-.history-item:hover {
-    background-color: #e8f5eb;
-    border-color: var(--primary-color);
-}
-
-.history-item-name {
-    flex-grow: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.history-item-price {
-    color: var(--primary-color);
-    font-weight: 600;
-    margin-left: 0.5rem;
-}
-
-/* Boutton d'expansion pour la fenêtre produit */
-.expand-product-window {
-    position: absolute;
-    top: 1rem;
-    right: 3rem;
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: var(--light-text);
-    transition: var(--transition);
-}
-
-.expand-product-window:hover {
-    color: var(--primary-color);
-}
-
-.product-detail-modal.expanded .product-detail-content {
-    width: 90%;
-    max-width: 900px;
-}
-
-/* Navigation entre les produits */
-.product-navigation {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border-color);
-}
-
-.nav-product-btn {
-    background-color: #f8f9fa;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    transition: var(--transition);
-    font-size: 0.9rem;
-    color: var(--text-color);
-}
-
-.nav-product-btn:hover:not(:disabled) {
-    background-color: #e8f5eb;
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-}
-
-.nav-product-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+/* S'assurer que les prix restent en rouge et gras même dans les messages de l'assistant */
+.bot-message .chat-price {
+    color: #ff0000 !important;
+    font-weight: bold !important;
 }

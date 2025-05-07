@@ -1,0 +1,56 @@
+/* widget.css */
+.twowin-widget-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #2c9b48;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    cursor: pointer;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .2s ease;
+  }
+  .twowin-widget-button:hover {
+    transform: scale(1.1);
+  }
+  
+  .twowin-widget-container {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 360px;
+    height: 500px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    overflow: hidden;
+    display: none;
+    z-index: 9999;
+    transition: width .3s ease, height .3s ease, bottom .3s ease, right .3s ease;
+  }
+  
+  /* quand on ajoute la classe .open, on passe en “maxi” */
+  .twowin-widget-container.open {
+    display: block !important;
+    width: 80vw;
+    height: 80vh;
+    bottom: 10%;
+    right: 10%;
+    border-radius: 8px;
+  }
+  
+  /* responsive */
+  @media(max-width: 500px) {
+    .twowin-widget-container.open {
+      bottom: 5%;
+      right: 5%;
+      width: 90vw;
+      height: 85vh;
+    }
+  }
+  
